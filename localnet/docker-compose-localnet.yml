@@ -52,7 +52,7 @@ services:
     container_name: localnet-sonr-vault
     build:
       context: $SONR_VAULT_CODE_DIR
-      dockerfile: docker/vault.dockerfile
+      dockerfile: docker/Dockerfile.localnet
     volumes:
       - ipfs_path:/home/sonr-vault-user/.ipfs
     environment:
