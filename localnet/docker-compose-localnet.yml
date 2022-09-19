@@ -17,22 +17,6 @@ services:
       sonrnet:
         ipv4_address: 172.16.238.2
 
-  sonr-vault:
-    container_name: localnet-sonr-vault
-    build:
-      context: $SONR_VAULT_CODE
-      dockerfile: docker/vault.dockerfile
-    image: sonr-vault
-    volumes:
-      - ipfs_path:/home/sonr-vault-user/.ipfs
-    environment:
-      - PORT=8888
-      - IPFS_PATH="~/.ipfs"
-    ports:
-      - 127.0.0.1:8888:8888
-    networks:
-      sonrnet:
-        ipv4_address: 172.16.238.3
 
         #sonr-build:
         #  container_name: sonr-build
@@ -43,33 +27,48 @@ services:
         #  volumes:
         #    -
 
-        #sonr0:
-        #  container_name: sonr-node0
-        #  image: sonr-ignite
-        #  build:
-        #    context: ..
-        #    dockerfile: dockerfile.sonr
-        #  environment:
-        #    - ID=0
-        #    - IPFS_ADDRESS=127.0.0.1:4001
-        #    - IPFS_API_ADDRESS=127.0.0.1:5001
-        #    - VAULT_API_ADDRESS=127.0.0.1:8888
-        #    - DEBUG=1
-        #  ports:
-        #    - 1317:1317
-        #    - 2345:2345
-        #    - 26656-26657:26656-26657
-        #    - 9090:9090
-        #    - 4500:4500
-        #  cap_add:
-        #    - SYS_PTRACE
-        #  security_opt:
-        #    - seccomp:unconfined
-        #  volumes:
-        #    - ./.testnets:/data:Z
-        #  networks:
-        #    sonrnet:
-        #      ipv4_address: 192.168.10.4
+  sonr0:
+    container_name: localnet-sonr-node0
+    build:
+      context: $SONR_CODE_DIR
+      dockerfile: docker/Dockerfile.localnet
+    environment:
+      - IPFS_ADDRESS=localnet-ipfs:4001
+      - IPFS_API_ADDRESS=localnet-ipfs:5001
+      - VAULT_API_ADDRESS=localnet-sonr-vault:8888
+    ports:
+      - 1317:1317
+      - 2345:2345
+      - 26656-26657:26656-26657
+      - 9090:9090
+      - 4500:4500
+    networks:
+      sonrnet:
+        ipv4_address: 172.16.238.3
+    depends_on:
+      - ipfs
+
+  sonr-vault:
+    container_name: localnet-sonr-vault
+    build:
+      context: $SONR_VAULT_CODE_DIR
+      dockerfile: docker/vault.dockerfile
+    volumes:
+      - ipfs_path:/home/sonr-vault-user/.ipfs
+    environment:
+      - PORT=8888
+      - IPFS_API_ADDR=172.16.238.2:5001
+        #- IPFS_PATH="~/.ipfs"
+      - SONR_RPC_ADDR_PUBLIC=172.16.238.3:9090
+    command: "--skip-chain-validation"
+    ports:
+      - 127.0.0.1:8888:8888
+
+    networks:
+      sonrnet:
+        ipv4_address: 172.16.238.4
+    depends_on:
+      - sonr0
 
         #sonr1:
         #  container_name: sonr-node1
@@ -102,6 +101,7 @@ volumes:
   ipfs_path:
   ipfs_fuse:
   ipns_fuse:
+  sonr_genesis:
 
 networks:
   sonrnet:
