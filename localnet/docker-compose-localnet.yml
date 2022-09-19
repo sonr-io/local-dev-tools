@@ -1,0 +1,113 @@
+services:
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: localnet-ipfs
+    volumes:
+      - ipfs_path:/data/ipfs
+      - ipfs_fuse:/ipfs
+      - ipns_fuse:/ipns
+    environment:
+      - IPFS_PATH=/data/ipfs
+    ports:
+      - 4001:4001/tcp
+      - 4001:4001/udp
+      - 127.0.0.1:5001:5001
+      - 127.0.0.1:8080:8080
+    networks:
+      sonrnet:
+        ipv4_address: 172.16.238.2
+
+  sonr-vault:
+    container_name: localnet-sonr-vault
+    build:
+      context: $SONR_VAULT_CODE
+      dockerfile: docker/vault.dockerfile
+    image: sonr-vault
+    volumes:
+      - ipfs_path:/home/sonr-vault-user/.ipfs
+    environment:
+      - PORT=8888
+      - IPFS_PATH="~/.ipfs"
+    ports:
+      - 127.0.0.1:8888:8888
+    networks:
+      sonrnet:
+        ipv4_address: 172.16.238.3
+
+        #sonr-build:
+        #  container_name: sonr-build
+        #  image: sonr-build
+        #  build:
+        #    context: ..
+        #    dockerfile: dockerfile.build-sonr
+        #  volumes:
+        #    -
+
+        #sonr0:
+        #  container_name: sonr-node0
+        #  image: sonr-ignite
+        #  build:
+        #    context: ..
+        #    dockerfile: dockerfile.sonr
+        #  environment:
+        #    - ID=0
+        #    - IPFS_ADDRESS=127.0.0.1:4001
+        #    - IPFS_API_ADDRESS=127.0.0.1:5001
+        #    - VAULT_API_ADDRESS=127.0.0.1:8888
+        #    - DEBUG=1
+        #  ports:
+        #    - 1317:1317
+        #    - 2345:2345
+        #    - 26656-26657:26656-26657
+        #    - 9090:9090
+        #    - 4500:4500
+        #  cap_add:
+        #    - SYS_PTRACE
+        #  security_opt:
+        #    - seccomp:unconfined
+        #  volumes:
+        #    - ./.testnets:/data:Z
+        #  networks:
+        #    sonrnet:
+        #      ipv4_address: 192.168.10.4
+
+        #sonr1:
+        #  container_name: sonr-node1
+        #  image: sonr-ignite
+        #  build:
+        #    context: ..
+        #    dockerfile: dockerfile.sonr
+        #  environment:
+        #    - ID=1
+        #    - IPFS_ADDRESS=127.0.0.1:4001
+        #    - IPFS_API_ADDRESS=127.0.0.1:5001
+        #    - VAULT_API_ADDRESS=127.0.0.1:8888
+        #    - DEBUG=1
+        #  ports:
+        #    - 1318:1317
+        #    - 2346:2345
+        #    - 26666-26667:26656-26657
+        #    - 9091:9090
+        #    - 4501:4500
+        #  cap_add:
+        #    - SYS_PTRACE
+        #  security_opt:
+        #    - seccomp:unconfined
+        #  volumes:
+        #    - ./.testnets:/data:Z
+        #  networks:
+        #    sonrnet:
+        #      ipv4_address: 192.168.10.5
+volumes:
+  ipfs_path:
+  ipfs_fuse:
+  ipns_fuse:
+
+networks:
+  sonrnet:
+    #driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+
