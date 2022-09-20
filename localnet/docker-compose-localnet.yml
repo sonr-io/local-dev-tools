@@ -17,16 +17,6 @@ services:
       sonrnet:
         ipv4_address: 172.16.238.2
 
-
-        #sonr-build:
-        #  container_name: sonr-build
-        #  image: sonr-build
-        #  build:
-        #    context: ..
-        #    dockerfile: dockerfile.build-sonr
-        #  volumes:
-        #    -
-
   sonr0:
     container_name: localnet-sonr-node0
     build:
@@ -63,40 +53,12 @@ services:
     command: "--skip-chain-validation"
     ports:
       - 127.0.0.1:8888:8888
-
     networks:
       sonrnet:
         ipv4_address: 172.16.238.4
     depends_on:
       - sonr0
 
-        #sonr1:
-        #  container_name: sonr-node1
-        #  image: sonr-ignite
-        #  build:
-        #    context: ..
-        #    dockerfile: dockerfile.sonr
-        #  environment:
-        #    - ID=1
-        #    - IPFS_ADDRESS=127.0.0.1:4001
-        #    - IPFS_API_ADDRESS=127.0.0.1:5001
-        #    - VAULT_API_ADDRESS=127.0.0.1:8888
-        #    - DEBUG=1
-        #  ports:
-        #    - 1318:1317
-        #    - 2346:2345
-        #    - 26666-26667:26656-26657
-        #    - 9091:9090
-        #    - 4501:4500
-        #  cap_add:
-        #    - SYS_PTRACE
-        #  security_opt:
-        #    - seccomp:unconfined
-        #  volumes:
-        #    - ./.testnets:/data:Z
-        #  networks:
-        #    sonrnet:
-        #      ipv4_address: 192.168.10.5
 volumes:
   ipfs_path:
   ipfs_fuse:
@@ -105,7 +67,6 @@ volumes:
 
 networks:
   sonrnet:
-    #driver: bridge
     ipam:
       driver: default
       config:
