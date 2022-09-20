@@ -1,6 +1,4 @@
 #!/bin/sh
-set -ex
-
 build=
 for args in "$@"
 do 
@@ -8,6 +6,14 @@ do
     build=1
   fi
 done
+
+ENV_FILE=.env
+if [ ! -f "$ENV_FILE" ]; then
+  echo "$ENV_FILE file doesn't exist"
+  echo "Run:         cp example.env .env"
+  echo "modify variables in .env, and run this script again."
+  exit 0
+fi
 
 
 unamestr=$(uname)
