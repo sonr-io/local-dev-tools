@@ -25,18 +25,16 @@ services:
     environment:
       - IPFS_ADDRESS=localnet-ipfs:4001
       - IPFS_API_ADDRESS=localnet-ipfs:5001
-      - VAULT_API_ADDRESS=localnet-sonr-vault:8888
     ports:
       - 1317:1317
       - 2345:2345
       - 26656-26657:26656-26657
       - 9090:9090
+      - 9091:9091
       - 4500:4500
     networks:
       sonrnet:
         ipv4_address: 172.16.238.3
-    depends_on:
-      - ipfs
 
   sonr-vault:
     container_name: localnet-sonr-vault
@@ -56,6 +54,46 @@ services:
     networks:
       sonrnet:
         ipv4_address: 172.16.238.4
+    depends_on:
+      - sonr0
+
+  sonr1:
+    container_name: localnet-sonr-node1
+    build:
+      context: $SONR_CODE_DIR
+      dockerfile: docker/Dockerfile.localnet
+    environment:
+      - IPFS_ADDRESS=localnet-ipfs:4001
+      - IPFS_API_ADDRESS=localnet-ipfs:5001
+      - PRIMARY_NODE_ADDR=localnet-sonr-node0
+    entrypoint:
+      - /bin/bash
+      - -c
+      - | 
+        echo 'Waiting for primary node to come up.'
+        until [ \
+        "$$(curl -s -w '%{http_code}' -o /dev/null "http://$${PRIMARY_NODE_ADDR}:1317/node_info")" \
+        -eq 200 ]
+        do
+          echo '.'
+          sleep 2
+        done
+        echo 'Primary node is up.'
+        export PRIMARY_NODE_ID=$$(curl --retry 3 --retry-delay 5 -X GET "http://$${PRIMARY_NODE_ADDR}:1317/node_info" -H "accept: application/json" \
+        | dasel -p json ".node_info.id" | tr -d '"')
+        curl "http://$${PRIMARY_NODE_ADDR}:26657/genesis" | dasel -p json .result.genesis > ~/.sonr/config/genesis.json
+        dasel put string -f ~/.sonr/config/config.toml p2p.persistent_peers "$${PRIMARY_NODE_ID}@$${PRIMARY_NODE_ADDR}:26656"
+        sonrd start
+    ports:
+      - 1318:1317
+      - 2346:2345
+      - 26666-26667:26656-26657
+      - 9092:9090
+      - 9093:9091
+      - 4501:4500
+    networks:
+      sonrnet:
+        ipv4_address: 172.16.238.5
     depends_on:
       - sonr0
 
