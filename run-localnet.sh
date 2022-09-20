@@ -25,7 +25,7 @@ fi
 
 
 if [ "$build" == "1" ]; then
-  docker-compose -f ./localnet/docker-compose-localnet.yml up --build
+  docker-compose -f ./localnet/docker-compose-localnet.yml up --build -d
 else
-  docker-compose -f ./localnet/docker-compose-localnet.yml up
+  docker-compose -f ./localnet/docker-compose-localnet.yml up -d
 fi
