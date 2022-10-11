@@ -6,6 +6,7 @@ help()
                [ -b | --build ]
                [ -s | --stop ]
                [ -S | --stop-all ]
+               [ -r | --run ]
                [ -h | --help  ]"
     exit 2
 }
@@ -13,17 +14,18 @@ help()
 needs_arg() { if [ -z "$OPTARG" ]; then echo "No arg for --$OPT option"; exit 2; fi; }
 
 
-while getopts 'b:s:-:BSh' OPT; do
-  if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
-    OPT="${OPTARG%%=*}"       # extract long option name
-    OPTARG="${OPTARG#$OPT}"   # extract long option argument (may be empty)
-    OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
+while getopts 'b:r:s:-:BSh' OPT; do
+  if [ "$OPT" = "-" ]; then
+    OPT="${OPTARG%%=*}"
+    OPTARG="${OPTARG#$OPT}"
+    OPTARG="${OPTARG#=}"
   fi
   case "$OPT" in
     B | build-all ) build_all=1 ;;
     b | build ) needs_arg; build="$OPTARG" ;;
     S | stop-all ) stop_all=1 ;;
     s | stop ) needs_arg; stop="$OPTARG" ;;
+    r | run ) needs_arg; run="$OPTARG" ;;
     h | help) help ;;
     ??*)
       echo "Unexpected option: --$OPT"
@@ -38,6 +40,7 @@ done
 
 build=$(echo "$build" | sed 's/,/ /g')
 stop=$(echo "$stop" | sed 's/,/ /g')
+run=$(echo "$run" | sed 's/,/ /g')
 
 COMPOSE_FILE="./localnet/docker-compose-localnet.yml"
 
@@ -67,11 +70,16 @@ if [ -n "$stop" ]; then
 fi
 
 if [ "$build_all" = "1" ]; then
-  docker-compose -f $COMPOSE_FILE build --no-cache
+  docker-compose -f $COMPOSE_FILE build
 fi
 
 if [ -n "$build" ]; then
-  docker-compose -f $COMPOSE_FILE build --no-cache "$build"
+  docker-compose -f $COMPOSE_FILE build "$build"
+fi
+
+if [ -n "$run" ]; then
+  docker-compose -f $COMPOSE_FILE up -d "$run"
+  exit 0
 fi
 
 docker-compose -f $COMPOSE_FILE up -d
