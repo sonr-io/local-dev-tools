@@ -65,7 +65,7 @@ if [ "$stop_all" = "1" ]; then
 fi
 
 if [ -n "$stop" ]; then
-  docker-compose -f $COMPOSE_FILE stop "$stop"
+  docker-compose -f $COMPOSE_FILE stop $stop
   exit 0
 fi
 
@@ -74,11 +74,11 @@ if [ "$build_all" = "1" ]; then
 fi
 
 if [ -n "$build" ]; then
-  docker-compose -f $COMPOSE_FILE build "$build"
+  docker-compose -f $COMPOSE_FILE build $build
 fi
 
 if [ -n "$run" ]; then
-  docker-compose -f $COMPOSE_FILE up -d "$run"
+  docker-compose -f $COMPOSE_FILE up -d $run
   exit 0
 fi
 
