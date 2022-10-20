@@ -7,8 +7,8 @@
 3. Run `run-localnet.sh` script
     * To run localnet with latest code changes run the script with `--build-all` flag.
 
-#### Available Options
-1. Run all Containers
+### Available Options
+#### 1. Run all Containers
 ```shell
 ➜ ./run-localnet.sh
 [+] Running 4/4
@@ -18,16 +18,11 @@
  ⠿ Container localnet-sonr-vault  Started                                     0.6s
 ```
 
-2. Build all Containers
-```shell
-➜ ./run-localnet.sh --build-all
-```
-Or
-```shell
-➜ ./run-localnet.sh -B
-```
+#### 2. Build all Containers (This will run all containers after finished building.)
+`➜ ./run-localnet.sh --build-all` Or `➜ ./run-localnet.sh -B`
 
-3. Run specific container without building. 
+
+#### 3. Run specific container without building. 
 For example run ipfs, vault and a single sonr node.
 ```shell
 ➜ ./run-localnet.sh -r ipfs,sonr0,sonr-vault
@@ -37,12 +32,12 @@ For example run ipfs, vault and a single sonr node.
  ⠿ Container localnet-sonr-vault  Running                                                          0.0s
 ``` 
 
-4. Build and run containers by provinding service name of the container.
+#### 4. Build and run containers by provinding service name of the container.
 ```
 ./run-localnet.sh -b ipfs,sonr0,sonr-vault
 ``` 
 
-5. Help
+#### 5. Help
 ```shell
 ➜ ./run-localnet.sh -h
 Usage: run-localnet.sh [ -B | --build-all ]
@@ -53,7 +48,7 @@ Usage: run-localnet.sh [ -B | --build-all ]
                [ -h | --help  ]
 ```
 
-#### Port mapping
+### Port mapping
 Following mappings are based on your localhost. Try `localhost:1317` on your browser and you can access http api console for `sonr0`, similarly try `locahost:1318` for `sonr1`.
 
 1. ipfs:

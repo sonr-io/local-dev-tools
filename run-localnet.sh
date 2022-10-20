@@ -65,7 +65,7 @@ if [ "$stop_all" = "1" ]; then
 fi
 
 if [ -n "$stop" ]; then
-  docker-compose -f $COMPOSE_FILE stop $stop
+  echo "$stop" | xargs docker-compose -f $COMPOSE_FILE stop
   exit 0
 fi
 
@@ -74,11 +74,11 @@ if [ "$build_all" = "1" ]; then
 fi
 
 if [ -n "$build" ]; then
-  docker-compose -f $COMPOSE_FILE build $build
+  echo "$build" | xargs docker-compose -f $COMPOSE_FILE build
 fi
 
 if [ -n "$run" ]; then
-  docker-compose -f $COMPOSE_FILE up -d $run
+  echo "$run" | xargs docker-compose -f $COMPOSE_FILE up -d
   exit 0
 fi
 
